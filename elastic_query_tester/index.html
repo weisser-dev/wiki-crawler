@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>ELT - Elastic Query Tester</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <script src="https://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="js/search.js"></script>
+
+    <link rel="stylesheet" href="lib/highlight/styles/railscasts.css">
+    <script src="lib/highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+   
+  </head>
+  <body>
+    <script id="searchErrorTemplate" type="text/x-jquery-tmpl">
+      <div class="search_result error">
+       <div class="result_attribute">
+         <b>Error:</b>
+         <pre>{{html responseJSON}}</pre>      
+        </div>
+      </div>
+    </script>
+    <script id="searchInfoTemplate" type="text/x-jquery-tmpl">
+      <div class="search_result">
+        <div class="info_attribute">
+          <b>SEARCH INFO:</b>
+          <table>
+            <tr>
+              <td>
+                visible entries:
+              </td>
+              <td>
+                ${data.hits.hits.length}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                total entries:
+              </td>
+              <td>
+                ${data.hits.total}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                search duration (ms):
+              </td>
+              <td>
+                ${data.took}
+              </td>
+            </tr>
+          </table>
+        </div> 
+        <div class="info_attribute">
+          <b>QUERY:</b>
+            <pre>{{html query}}</pre>
+        </div>  
+      </div>
+    </script>
+    <script id="searchResultTemplate" type="text/x-jquery-tmpl">
+      {{each(i,result) hits}}
+        <div class="search_result">
+            {{each(i,key) result.dynamicResponseInfo.keys}}
+              <div class="result_attribute">
+                  {{if key != null}}
+                    <b>${key}:</b>
+                    ${result.dynamicResponseInfo.values[i]}
+                  {{/if}}
+             </div>
+            {{/each}}
+            <div class="result_attribute">
+              <b>_source:</b>
+              <table>
+                {{each(i,key) result.dynamicResponse.keys}}
+                  <tr>
+                    <td class="generatedTableKey">
+                      ${key}
+                    </td>
+                    <td class="generatedTableValue">
+                      {{html result.dynamicResponse.values[i]}}
+                    </td>
+                  </tr>
+                {{/each}}
+              </table>
+            </div>
+        </div>
+      {{/each}}
+    </script>
+    <h1>3L45T1C QU3RY T35T3R</h1>
+    <section class="search">
+      <div class="search_query">
+        <div>
+          <div class="search_settings">
+            HOST: <input id="host" type="text" value="http://localhost:9200" name="host"> 
+            INDEX: <input id="index" type="text" value="wiki" name="index"> 
+            TYPE: <input id="type" type="text" value="wiki" name="type">
+            URL PARAMETER: <input id="urlparam" type="text" value="_search?pretty" name="urlparam">
+            <div class="onoffswitch">
+              <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="httpMethod" value="POST">
+              <label class="onoffswitch-label" for="httpMethod">
+                  <span class="onoffswitch-inner"></span>
+                  <span class="onoffswitch-switch"></span>
+              </label>
+            </div>
+          </div>
+          
+        </div>
+        <textarea id="query" spellcheck="false">
+{ 
+        "size": 2,
+        "query": { 
+                "query_string" : {
+                        "query" : "data.terms", 
+                        "fields" : ["text^1.5"], 
+                        "default_operator": "AND" 
+                } 
+        }, 
+        "sort": [ 
+                { "_score":{"order":"desc"}} 
+        ] 
+}
+      </textarea>
+      </div>
+      <div class="search_box">
+        <input id="search_txt" placeholder="WH47 4R3 Y0U L00k1N6 F0R?">
+      </div>
+      <div class="search_hr"></div>
+      <div id="error" class="search_info"></div>
+      <div id="info" class="search_info"></div>
+      <div id="results" class="search_results"></div>
+    </section>  
+  </body>
+</html>
